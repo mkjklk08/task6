@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import './App.css';
 
 // Подключаемся к серверу
-const socket = io('http://localhost:4000');
+const socket = io('https://task6-nyy6.onrender.com');
 
 function App() {
   // Состояния пользователя
@@ -18,47 +18,39 @@ function App() {
   const [gameResult, setGameResult] = useState(null);
 
   useEffect(() => {
-    // 1. Слушаем список доступных комнат
     socket.on('update-rooms', (availableRooms) => {
       setRooms(availableRooms);
     });
 
-    // 2. Получаем начальную статистику при входе
     socket.on('init-stats', (userData) => {
       setStats({ wins: userData.wins });
     });
 
-    // 3. Обновление статистики (счетчика) в реальном времени
     socket.on('stat-update', (data) => {
       if (data.name === name) {
         setStats({ wins: data.wins });
       }
     });
 
-    // 4. Начало игры
     socket.on('game-start', (game) => {
       setGameResult(null);
       setCurrentGame(game);
-      // Определяем, кто мы: X или O
       setMySymbol(game.players[0] === name ? 'X' : 'O');
     });
 
-    // 5. Обновление доски после каждого хода
     socket.on('update-board', (data) => {
       setCurrentGame(prev => ({ ...prev, ...data }));
     });
 
-    // 6. Конец игры
     socket.on('game-over', (data) => {
       setCurrentGame(prev => ({ ...prev, board: data.board }));
       
       if (data.winner === 'Draw') {
-        setGameResult("НИЧЬЯ");
+        setGameResult("TIE");
       } else {
-        setGameResult(`ПОБЕДИТЕЛЬ: ${data.winner}`);
+        setGameResult(`THE WINNER: ${data.winner}`);
       }
 
-      // Возвращаемся в лобби через 4 секунды
       setTimeout(() => {
         setCurrentGame(null);
         setGameResult(null);
@@ -75,7 +67,6 @@ function App() {
     };
   }, [name]);
 
-  // Функции взаимодействия
   const login = () => {
     if (name.trim()) {
       setIsLogged(true);
@@ -93,7 +84,6 @@ function App() {
   };
 
   const makeMove = (index) => {
-    // Проверяем: сейчас наш ход? Клетка пуста? Игра не окончена?
     if (
       currentGame &&
       !gameResult &&
@@ -112,9 +102,8 @@ function App() {
     <div className="app-container">
       <div className="card">
         {!isLogged ? (
-          /* ЭКРАН ВХОДА */
           <div className="login-screen">
-            <h1>NEURAL TOE</h1>
+            <h1>MKJKLK'S TOE</h1>
             <p className="status-text">IDENTIFICATION REQUIRED</p>
             <input 
               type="text" 
@@ -126,7 +115,6 @@ function App() {
             <button className="btn" onClick={login}>INITIALIZE</button>
           </div>
         ) : !currentGame ? (
-          /* ЭКРАН ЛОББИ */
           <div className="lobby-screen">
             <div className="user-info">
               <h2>{name}</h2>
@@ -147,7 +135,6 @@ function App() {
             </div>
           </div>
         ) : (
-          /* ЭКРАН ИГРЫ */
           <div className="game-screen">
             <div className="game-header">
               <div className="status-text">
