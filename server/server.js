@@ -9,8 +9,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
-// Подключение к MongoDB (замени URL на свой, если нужно)
-mongoose.connect('mongodb://127.0.0.1:27017/tictactoe');
+mongoose.connect('mongodb+srv://mkjklk970901_db_user:2mGQXAXy4No7aDM9@cluster0.0hxjctp.mongodb.net/?appName=Cluster0');
 
 const UserSchema = new mongoose.Schema({
   name: String,
